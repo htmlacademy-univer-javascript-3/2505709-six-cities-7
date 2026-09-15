@@ -1,8 +1,12 @@
 import MainPage from '../../pages/main-page/main-page';
 
-function App() {
+type AppProps = {
+  offersCnt: number;
+}
+
+function App(props: AppProps) {
   return (
-    <MainPage />
+    <MainPage {...props} />
   );
 }
 

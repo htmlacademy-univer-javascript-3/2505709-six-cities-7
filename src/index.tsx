@@ -5,8 +5,10 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+const offersCnt = 312;
+
 root.render(
   <React.StrictMode>
-    <App />
+    <App offersCnt={offersCnt} />
   </React.StrictMode>
 );
