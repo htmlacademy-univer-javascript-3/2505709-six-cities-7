@@ -2,10 +2,10 @@ import OfferCard from '../../components/offer-card/offer-card';
 
 
 type MainPageProps = {
-  offersCnt: number;
+  offersCount: number;
 }
 
-function MainPage({ offersCnt }: MainPageProps): JSX.Element {
+function MainPage({ offersCount: offersCnt }: MainPageProps): JSX.Element {
   return (
     <div className="page page--gray page--main">
       <header className="header">
