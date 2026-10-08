@@ -1,0 +1,15 @@
+import { Navigate } from 'react-router-dom';
+
+type PrivateRouteProps = {
+  children: JSX.Element;
+};
+
+function PrivateRoute({ children }: PrivateRouteProps) {
+
+  const isAuth = false;
+  return isAuth
+    ? children
+    : <Navigate to="/login" />;
+}
+
+export default PrivateRoute;
