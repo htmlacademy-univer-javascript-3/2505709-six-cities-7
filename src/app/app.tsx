@@ -7,21 +7,31 @@ import NotFound from '../pages/not-found/not-found';
 import { TOffers } from '../types/offers';
 import PrivateRoute from '../components/privateRoute';
 import { ROUTES } from '../routes';
+import { useAppSelector } from '../hooks';
+import LoadingScreen from '../components/spinner/spinner';
+import { AuthorizationStatus } from '../const';
 
 type AppProps = {
-  offersData: TOffers;
-  isAuth: boolean;
   offersFavoritesData: TOffers;
 }
 
-function App({ offersData, isAuth, offersFavoritesData }: AppProps) {
+function App({ offersFavoritesData }: AppProps) {
+
+  const isOffersDataLoading = useAppSelector((state) => state.isOffersDataLoading);
+  const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
+  if (authorizationStatus === AuthorizationStatus.Unknown || isOffersDataLoading) {
+    return (
+      <LoadingScreen />
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={ROUTES.mainPage} element={<MainPage offersData={offersData} />} />
+        <Route path={ROUTES.mainPage} element={<MainPage />} />
         <Route path={ROUTES.login} element={<Login />} />
         <Route path={ROUTES.favorites} element={
-          <PrivateRoute isAuth={isAuth}>
+          <PrivateRoute>
             <Favorites offersData={offersFavoritesData} />
           </PrivateRoute>
         }
