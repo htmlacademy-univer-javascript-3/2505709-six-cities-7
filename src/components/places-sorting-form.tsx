@@ -1,0 +1,82 @@
+import { useState } from 'react';
+import { SortType } from '../const';
+
+
+type PlacesSortingFormProps = {
+  currentSort: SortType;
+  onSortChange: (sortType: SortType) => void;
+};
+
+
+function PlacesSortingForm({
+  currentSort,
+  onSortChange,
+}: PlacesSortingFormProps) {
+
+  const [isVisible, setIsvisible] = useState(true);
+
+
+  return (
+    <form className="places__sorting">
+      <div onClick={() => setIsvisible(!isVisible)}>
+        <span className="places__sorting-caption">
+          Sort by
+        </span>
+
+        <span className="places__sorting-type" tabIndex={0}>
+          {currentSort}
+        </span>
+      </div>
+
+      {isVisible &&
+        <ul className="places__options places__options--custom places__options--opened">
+          <li
+            className="places__option"
+            tabIndex={0}
+            onClick={() => {
+              onSortChange(SortType.Popular);
+              setIsvisible(!isVisible);
+            }}
+          >
+            Popular
+          </li>
+
+          <li
+            className="places__option"
+            tabIndex={0}
+            onClick={() => {
+              onSortChange(SortType.PriceLowToHight);
+              setIsvisible(!isVisible);
+            }}
+          >
+            Price: low to high
+          </li>
+
+          <li
+            className="places__option"
+            tabIndex={0}
+            onClick={() => {
+              onSortChange(SortType.PriceHighToLow);
+              setIsvisible(!isVisible);
+            }}
+          >
+            Price: high to low
+          </li>
+
+          <li
+            className="places__option"
+            tabIndex={0}
+            onClick={() => {
+              onSortChange(SortType.TopRated);
+              setIsvisible(!isVisible);
+            }}
+          >
+            Top rated first
+          </li>
+        </ul>}
+
+    </form >
+  );
+}
+export default PlacesSortingForm;
+

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import leaflet, { Map as LeafletMap, Marker } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
+import { matchPath, useLocation } from 'react-router-dom';
 import { TOffers } from '../types/offers';
 
 type MapProps = {
@@ -26,10 +26,15 @@ function Map({
   activeOfferId,
 }: MapProps): JSX.Element {
   const mapRef = useRef<HTMLDivElement>(null);
-
   const mapInstanceRef = useRef<LeafletMap | null>(null);
 
   const markersRef = useRef<Marker[]>([]);
+
+  const { pathname } = useLocation();
+
+  const isOfferPage = Boolean(
+    matchPath('/offer/:id', pathname)
+  );
 
   useEffect(() => {
     if (mapRef.current === null || offersData.length === 0) {
@@ -52,11 +57,19 @@ function Map({
           'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_4mcu_1_386491d060a42dc62e56b5ff',
           {
             attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attribution/">CARTO</a>',
-            maxZoom: 20
+              '&copy; OpenStreetMap contributors &copy; CARTO',
+            maxZoom: 20,
           }
         )
         .addTo(mapInstanceRef.current);
+    } else {
+      mapInstanceRef.current.setView(
+        [
+          city.location.latitude,
+          city.location.longitude,
+        ],
+        city.location.zoom
+      );
     }
   }, [offersData]);
 
@@ -91,7 +104,7 @@ function Map({
 
   return (
     <section
-      className="cities__map map"
+      className={`map ${isOfferPage ? 'offer__map' : 'cities__map'}`}
       ref={mapRef}
     />
   );
