@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { AppDispatch, TState } from '.';
-import { AxiosInstance } from 'axios';
-import { TOffers } from '../types/offers';
+import axios, { AxiosInstance } from 'axios';
+import { TOffer, TOffers } from '../types/offers';
 import { APIRoute, TIMEOUT_SHOW_ERROR } from '../const';
 import { setError } from './app-error/app-error-slice';
 import { AuthData } from '../types/auth-data';
@@ -9,9 +9,10 @@ import { UserData } from '../types/user-data';
 import { dropToken, saveToken } from '../services/token';
 import { TOfferDetails } from '../types/offerDetails';
 import { TComment, TCommentFormData } from '../types/comments';
+import { TFavoriteData } from '../types/favorite-data';
 
 
-export const fetchOffersAction = createAsyncThunk<TOffers, undefined, {
+export const fetchOffers = createAsyncThunk<TOffers, undefined, {
   dispatch: AppDispatch;
   state: TState;
   extra: AxiosInstance;
@@ -21,6 +22,39 @@ export const fetchOffersAction = createAsyncThunk<TOffers, undefined, {
     const { data } = await api.get<TOffers>(APIRoute.Offers);
     return data;
   },
+);
+
+export const fetchFavoriteOffers = createAsyncThunk<TOffers, undefined, {
+  dispatch: AppDispatch;
+  state: TState;
+  extra: AxiosInstance;
+}>(
+  'data/fetchFavoriteOffers',
+  async (_arg, { extra: api }) => {
+    const { data } = await api.get<TOffers>(APIRoute.Favorite);
+    return data;
+  }
+);
+
+export const changeOfferFavoriteStatus = createAsyncThunk<
+  TOffer,
+  TFavoriteData,
+  {
+    dispatch: AppDispatch;
+    state: TState;
+    extra: AxiosInstance;
+  }
+>(
+  'data/changeOffersFavoriteStatus',
+  async ({ id, status }, { extra: api, dispatch }) => {
+    const { data } = await api.post<TOffer>(
+      `${APIRoute.Favorite}/${id}/${status}`
+    );
+
+    await dispatch(fetchFavoriteOffers());
+
+    return data;
+  }
 );
 
 export const fetchOfferDetails = createAsyncThunk<
@@ -98,15 +132,28 @@ export const sendComment = createAsyncThunk<
   }
 );
 
-export const checkAuthAction = createAsyncThunk<void, undefined, {
-  dispatch: AppDispatch;
-  state: TState;
-  extra: AxiosInstance;
-}
+export const checkAuthAction = createAsyncThunk<
+  string,
+  undefined,
+  {
+    dispatch: AppDispatch;
+    state: TState;
+    extra: AxiosInstance;
+    rejectValue: number;
+  }
 >(
   'user/checkAuth',
-  async (_arg, { extra: api }) => {
-    await api.get(APIRoute.Login);
+  async (_arg, { extra: api, rejectWithValue }) => {
+    try {
+      const { data: { email } } = await api.get<UserData>(APIRoute.Login);
+      return email;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return rejectWithValue(401);
+      }
+
+      throw error;
+    }
   }
 );
 
@@ -151,4 +198,5 @@ export const clearErrorAction = createAsyncThunk<
     }, TIMEOUT_SHOW_ERROR);
   },
 );
+
 

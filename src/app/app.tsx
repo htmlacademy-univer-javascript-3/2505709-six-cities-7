@@ -4,24 +4,27 @@ import MainPage from '../pages/main-page/main-page';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Offer from '../pages/offer/offer';
 import NotFound from '../pages/not-found/not-found';
-import { TOffers } from '../types/offers';
-import PrivateRoute from '../components/privateRoute';
+import PrivateRoute from '../components/routes/privateRoute';
 import { ROUTES } from '../routes';
-import { useAppSelector } from '../hooks';
+import { useAppSelector } from '../store/store-hooks';
 import LoadingScreen from '../components/spinner/spinner';
 import { AuthorizationStatus } from '../const';
 import { getOffersStatus } from '../store/offers/offers-selectors';
-import { getAuthorizationStatus } from '../store/user-process/user-process-selectors';
+import { getAuthorizationStatus, getCheckAuthStatus } from '../store/user-process/user-process-selectors';
+import PublicRoute from '../components/routes/publicRoute';
+import useFetchOffers from '../hooks/use-fetch-offers/useFetchOffers';
+import useCheckAuth from '../hooks/use-check-auth/useCheckAuth';
 
-type AppProps = {
-  offersFavoritesData: TOffers;
-}
 
-function App({ offersFavoritesData }: AppProps) {
+function App() {
+
+  useFetchOffers();
+  useCheckAuth();
 
   const OffersStatus = useAppSelector(getOffersStatus);
   const authorizationStatus = useAppSelector(getAuthorizationStatus);
-  if (authorizationStatus === AuthorizationStatus.Unknown || OffersStatus === 'loading') {
+  const checkAuthStatus = useAppSelector(getCheckAuthStatus);
+  if ((authorizationStatus === AuthorizationStatus.Unknown || OffersStatus === 'loading') && checkAuthStatus !== 'error') {
     return (
       <LoadingScreen />
     );
@@ -31,10 +34,15 @@ function App({ offersFavoritesData }: AppProps) {
     <BrowserRouter>
       <Routes>
         <Route path={ROUTES.mainPage} element={<MainPage />} />
-        <Route path={ROUTES.login} element={<Login />} />
+        <Route path={ROUTES.login} element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+        />
         <Route path={ROUTES.favorites} element={
           <PrivateRoute>
-            <Favorites offersData={offersFavoritesData} />
+            <Favorites />
           </PrivateRoute>
         }
         />
