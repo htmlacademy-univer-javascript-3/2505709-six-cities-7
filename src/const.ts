@@ -19,7 +19,8 @@ export enum APIRoute {
   Offers = '/offers',
   Favorite = 'favorite',
   Login = 'login',
-  Logout = 'logout'
+  Logout = 'logout',
+  Comments = 'comments'
 }
 
 export enum AuthorizationStatus {
@@ -29,3 +30,6 @@ export enum AuthorizationStatus {
 }
 
 export const TIMEOUT_SHOW_ERROR = 2000;
+
+export type RequestStatus = 'idle' | 'loading' | 'success' | 'error';
+
